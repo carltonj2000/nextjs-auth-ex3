@@ -20,7 +20,7 @@ npx drizzle-kit studio
 The code in this repository is based on:
 
 - https://www.nexttonone.lol/part-1
-  - 1/11/24 - Finished Part 2
+  - 1/12/24 - Finished Part 2
 
 ## Creation History
 
