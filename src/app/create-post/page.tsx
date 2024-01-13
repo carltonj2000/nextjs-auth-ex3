@@ -1,31 +1,30 @@
-import SubmitButton from "@/app/create-post/submit-button";
-import { db } from "@/db";
-import { posts } from "@/db/schema/posts";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+"use client";
+
+import { createPost } from "@/app/create-post/actions";
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 export default function CreatePost() {
-  async function handleCreatePost(data: FormData) {
-    "use server";
-    const content = data.get("content") as string;
+  const [content, setContent] = useState("");
 
-    const result = await db
-      .insert(posts)
-      .values({
-        content,
-        userId: "1",
-      })
-      .returning();
+  const buttonDisabled = content.length < 3;
 
-    console.log(result);
-    revalidatePath("/");
-    redirect("/");
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await createPost(content);
+    if (result?.error) {
+      console.log(result.error);
+      return;
+    }
+
+    setContent("");
+  };
+
   return (
     <main className="text-center mt-10">
       <form
+        onSubmit={handleSubmit}
         className="border border-neutral-500 rounded-lg px-6 py-4 flex flex-col gap-4"
-        action={handleCreatePost}
       >
         <label className="w-full">
           <textarea
@@ -33,10 +32,24 @@ export default function CreatePost() {
             name="content"
             placeholder="Post a thing..."
             required
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
           />
         </label>
 
-        <SubmitButton />
+        <div className="text-neutral-500">Characters: {content.length}</div>
+
+        <button
+          type="submit"
+          className={twMerge(
+            "border rounded-xl px-4 py-2 disabled",
+            buttonDisabled && "opacity-50"
+          )}
+          disabled={buttonDisabled}
+          aria-disabled={buttonDisabled}
+        >
+          Post
+        </button>
       </form>
     </main>
   );
