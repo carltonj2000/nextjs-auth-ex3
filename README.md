@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# NextJS Auth Example 3
 
-## Getting Started
+Technologies used:
 
-First, run the development server:
+- tailwind css
+- shandcn UI
+- Drizzle
+- Neon
+
+Common Commands:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# push the db schema to the db
+npx drizzle-kit push:pg
+npx drizzle-kit studio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Code History
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The code in this repository is based on:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- https://www.nexttonone.lol/part-1
+  - 1/11/24 - Finished Part 2
 
-## Learn More
+## Creation History
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx create-next-app@latest
+cd nextjs-auth-ex3/
+npm i drizzle-orm
+npm install -D drizzle-kit
+npm install -D dotenv
+# push the db schema to the db
+npx drizzle-kit push:pg
+# need the below for drizzle-kit studio
+npm install -D pg
+npx drizzle-kit studio
+npm i @neondatabase/serverless
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## DB Setup And Use
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```sql title="Migration Role"
+-- Create a new role for migrations
+CREATE ROLE migration_role WITH LOGIN PASSWORD 'password';
+-- Grant permissions on the "neondb" database
+GRANT ALL PRIVILEGES ON DATABASE "neondb" TO migration_role;
+-- Grant usage on the "public" schema
+GRANT USAGE, CREATE ON SCHEMA public TO migration_role;
+-- Become a member of migration_role
+GRANT migration_role TO current_user;
+```
 
-## Deploy on Vercel
+```sql title="App Role"
+-- Create a new role for the application
+CREATE ROLE app_role WITH LOGIN PASSWORD 'password';
+-- Grant permissions on the "neondb" database
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_role;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_role;
+-- Set default privileges for future tables
+ALTER DEFAULT PRIVILEGES FOR ROLE migration_role IN SCHEMA public
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_role;
+-- Set default privileges for future sequences
+ALTER DEFAULT PRIVILEGES FOR ROLE migration_role IN SCHEMA public
+GRANT USAGE, SELECT ON SEQUENCES TO app_role;
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Creating a new Migration Role
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You don't need to run any of this code right now, but it's here as a reference for if you need it in the future.
+
+If you've already performed a migration and need to create a new role to perform migrations, first delete the migration_role, then create a new one using the same [migration code][#migration-role] code as above. Then grant permission to the drizzle schema and transfer ownership of all tables to the new role.
+
+```sql title="New Migration Role"
+GRANT USAGE, CREATE ON SCHEMA public TO migration_role2;
+
+DO $$
+DECLARE
+   table_name text;
+BEGIN
+   FOR table_name IN (SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public')
+   LOOP
+      EXECUTE 'ALTER TABLE ' || table_name || ' OWNER TO migration_user2;';
+   END LOOP;
+END $$;
+-- Set default privileges for future tables
+ALTER DEFAULT PRIVILEGES FOR ROLE migration_role2 IN SCHEMA public
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_role;
+-- Set default privileges for future sequences
+ALTER DEFAULT PRIVILEGES FOR ROLE migration_role2 IN SCHEMA public
+GRANT USAGE, SELECT ON SEQUENCES TO app_role;
+```
