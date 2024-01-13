@@ -10,6 +10,9 @@ export default function NavBar() {
         <li>
           <Link href="/create-post">Create Post</Link>
         </li>
+        <li>
+          <Link href="/profile/carltonj2000">User Profile</Link>
+        </li>
       </ul>
     </nav>
   );
