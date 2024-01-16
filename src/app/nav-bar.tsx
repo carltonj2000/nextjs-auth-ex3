@@ -11,7 +11,7 @@ export default function NavBar() {
           <Link href="/create-post">Create Post</Link>
         </li>
         <li>
-          <Link href="/profile/carltonj2000">User Profile</Link>
+          <Link href="/me">User Profile</Link>
         </li>
         <li>
           <Link href="/login">Login</Link>

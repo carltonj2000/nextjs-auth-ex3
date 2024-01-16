@@ -13,6 +13,7 @@ Common Commands:
 # push the db schema to the db
 npx drizzle-kit push:pg
 npx drizzle-kit studio
+openssl rand -hex 32 # to generate an auth secret
 ```
 
 ## Code History
@@ -36,6 +37,7 @@ npx drizzle-kit push:pg
 npm install -D pg
 npx drizzle-kit studio
 npm i @neondatabase/serverless
+npm install next-auth@beta
 ```
 
 ## DB Setup And Use
