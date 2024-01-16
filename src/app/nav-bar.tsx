@@ -13,6 +13,9 @@ export default function NavBar() {
         <li>
           <Link href="/profile/carltonj2000">User Profile</Link>
         </li>
+        <li>
+          <Link href="/login">Login</Link>
+        </li>
       </ul>
     </nav>
   );
