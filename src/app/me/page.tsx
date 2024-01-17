@@ -3,15 +3,12 @@ import FeedPost from "@/components/feed-post";
 import { userPostsQuery } from "@/db/queries/postFeed";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 async function ProfilePage() {
   const session = await auth();
-  if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=/me");
-  }
+
   const { user } = session;
-  const posts = await userPostsQuery.execute({ id: session.user.id });
+  const posts = await userPostsQuery.execute({ id: session?.user.id });
 
   return (
     <>
@@ -23,7 +20,7 @@ async function ProfilePage() {
           <div className="rounded-full h-20 w-20 overflow-hidden relative">
             <Image
               className="object-cover"
-              src={session.user.image}
+              src={session?.user.image}
               alt={user.name}
               quality={100}
               priority={true}

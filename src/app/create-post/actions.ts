@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { posts as postsTable } from "@/db/schema/posts";
 
-export async function createPost(content: string, id: string) {
+export async function createPost(content: string) {
   const session = await auth();
   if (!session?.user) {
     return { message: "not authenticated" };
@@ -19,7 +19,7 @@ export async function createPost(content: string, id: string) {
   try {
     await db.insert(postsTable).values({
       content,
-      userId: id,
+      userId: session.user.id,
     });
   } catch (error) {
     console.error(error);
