@@ -19,7 +19,7 @@ async function Profile() {
     user = await db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.username, username))
+      .where(eq(usersTable.name, username))
       .then((result) => result[0]);
   } catch (e: any) {
     console.error(e);

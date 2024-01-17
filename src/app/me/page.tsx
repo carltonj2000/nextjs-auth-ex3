@@ -1,33 +1,44 @@
-import { db } from "@/db";
-import { users as usersTable } from "@/db/schema/users";
-import { eq } from "drizzle-orm";
-
 import { auth } from "@/auth";
+import FeedPost from "@/components/feed-post";
+import { userPostsQuery } from "@/db/queries/postFeed";
+import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function Profile() {
+async function ProfilePage() {
   const session = await auth();
-
   if (!session?.user) {
     redirect("/api/auth/signin?callbackUrl=/me");
   }
-  const userId = "1";
+  const { user } = session;
+  const posts = await userPostsQuery.execute({ id: session.user.id });
 
-  const user = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.id, userId))
-    .then((result) => result[0]);
   return (
     <>
-      <h1>
-        {user.firstName} {user.lastName}
-      </h1>
-      <code>
-        <pre>{JSON.stringify(session, null, 2)}</pre>
-      </code>
+      <div className="flex justify-between">
+        <div>
+          <h2 className="text-3xl font-semibold">{user.name}</h2>
+        </div>
+        <Link href={user.image}>
+          <div className="rounded-full h-20 w-20 overflow-hidden relative">
+            <Image
+              className="object-cover"
+              src={session.user.image}
+              alt={user.name}
+              quality={100}
+              priority={true}
+              fill={true}
+            />
+          </div>
+        </Link>
+      </div>
+      <div>
+        {posts.map((post) => (
+          <FeedPost key={post.id} post={post} />
+        ))}
+      </div>
     </>
   );
 }
 
-export default Profile;
+export default ProfilePage;

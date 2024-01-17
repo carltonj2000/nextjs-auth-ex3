@@ -2,17 +2,17 @@ import { db } from "@/db";
 import { media as mediaTable } from "@/db/schema/media";
 import { posts as postsTable } from "@/db/schema/posts";
 import { users as usersTable } from "@/db/schema/users";
-import { eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
-export const query = db
+export const baseQuery = db
   .select({
     id: postsTable.id,
     content: postsTable.content,
     createdAt: postsTable.createdAt,
     user: {
       id: usersTable.id,
-      username: usersTable.username,
-      avatar: usersTable.avatar,
+      name: usersTable.name,
+      image: usersTable.image,
     },
     media: {
       id: mediaTable.id,
@@ -24,10 +24,18 @@ export const query = db
   })
   .from(postsTable)
   .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-  .leftJoin(mediaTable, eq(mediaTable.id, postsTable.mediaId))
-  .prepare("select_posts_for_feed");
+  .leftJoin(mediaTable, eq(mediaTable.id, postsTable.mediaId));
 
-export type Result = Awaited<ReturnType<typeof query.execute>>[0];
+export type PostT = Awaited<ReturnType<typeof baseQuery.execute>>[0];
+
+export const postsFeedQuery = baseQuery
+  .orderBy(desc(postsTable.createdAt))
+  .prepare("posts_for_feed");
+
+export const userPostsQuery = baseQuery
+  .where(eq(usersTable.id, sql.placeholder("id")))
+  .orderBy(desc(postsTable.createdAt))
+  .prepare("posts_for_user_feed");
 
 // const posts = await db.select().from(postsTable);
 

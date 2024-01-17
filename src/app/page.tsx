@@ -1,9 +1,8 @@
 import FeedPost from "@/components/feed-post";
-import { query } from "@/db/queries/postFeed";
+import { postsFeedQuery } from "@/db/queries/postFeed";
 
 export default async function Home() {
-  const posts = await query.execute();
-  console.log(posts);
+  const posts = await postsFeedQuery.execute();
   return (
     <main className="text-center mt-10">
       <h1>Threads</h1>

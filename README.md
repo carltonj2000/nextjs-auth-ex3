@@ -21,7 +21,7 @@ openssl rand -hex 32 # to generate an auth secret
 The code in this repository is based on:
 
 - https://www.nexttonone.lol/part-1
-  - 1/12/24 - Finished Part 2
+- https://github.com/Sam-Meech-Ward/threads
 
 ## Creation History
 

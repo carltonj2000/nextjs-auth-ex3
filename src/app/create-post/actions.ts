@@ -6,9 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { posts as postsTable } from "@/db/schema/posts";
 
-export async function createPost(content: string) {
-  console.log(content);
-
+export async function createPost(content: string, id: string) {
   if (!content || content.length < 3) {
     return { error: "not enough content" };
   }
@@ -16,7 +14,7 @@ export async function createPost(content: string) {
   try {
     await db.insert(postsTable).values({
       content,
-      userId: "1",
+      userId: id,
     });
   } catch (error) {
     console.error(error);

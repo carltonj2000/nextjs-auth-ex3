@@ -14,7 +14,10 @@ export default function NavBar() {
           <Link href="/me">User Profile</Link>
         </li>
         <li>
-          <Link href="/login">Login</Link>
+          <Link href="/api/auth/signin?callbackUrl=/">Login</Link>
+        </li>
+        <li>
+          <Link href="/api/auth/signout?callbackUrl=/">Logout</Link>
         </li>
       </ul>
     </nav>
